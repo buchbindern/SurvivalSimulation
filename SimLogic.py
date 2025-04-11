@@ -109,7 +109,7 @@ def simulation(n_samples, hazard_ratio, n_repeats=3):
                 data_mean[key].append(values)
 
     data_mean = pd.DataFrame.from_dict(data_mean)
-    data_std = pd.DataFrame.from_dict({k: v for k, v in data_std.items() if k != "Best Params"}) #Added this line
+    data_std = pd.DataFrame.from_dict({k: v for k, v in data_std.items() if k != "Best Params"})
     return data_mean, data_std
 
 def plot_results(data_mean, data_std, **kwargs):
@@ -123,31 +123,3 @@ def plot_results(data_mean, data_std, **kwargs):
     ax.yaxis.grid(True)
     ax.axhline(0.0, color="gray")
     return ax
-
-
-def plot_hyperparameters(data_mean):
-    # Extract and flatten list of dicts into a DataFrame
-    hyperparams = pd.DataFrame(data_mean["Best Params"].tolist(), index=data_mean.index)
-
-    # This converts each dict into a string reliably
-    hyperparams_str = data_mean["Best Params"].apply(lambda d: str(d) if isinstance(d, dict) else str(d))
-
-    # Add to the DataFrame
-    hyperparams["hyperparams_str"] = hyperparams_str
-    hyperparams["censoring"] = data_mean.index
-
-    # Melt for plotting
-    hyperparams_long = hyperparams.melt(
-        id_vars=["censoring", "hyperparams_str"], 
-        var_name="hyperparameter", 
-        value_name="value"
-    )
-
-    # Plot
-    plt.figure(figsize=(12, 6))
-    sns.boxplot(x="censoring", y="value", hue="hyperparams_str", data=hyperparams_long)
-    plt.title("Hyperparameter Distribution by Censoring Percentage")
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
-
