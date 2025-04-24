@@ -10,6 +10,7 @@ import seaborn as sns
 
 def generate_marker(n_samples, hazard_ratio, baseline_hazard, rnd):
     X = rnd.randn(n_samples, 1)
+    print(X.shape)
     hazard_ratio = np.array([hazard_ratio])
     logits = np.dot(X, np.log(hazard_ratio))
     u = rnd.uniform(size=n_samples)
@@ -20,6 +21,8 @@ def generate_marker(n_samples, hazard_ratio, baseline_hazard, rnd):
 
 def generate_survival_data(n_samples, hazard_ratio, baseline_hazard, percentage_cens, rnd):
     X, time_event, actual_c = generate_marker(n_samples, hazard_ratio, baseline_hazard, rnd)
+    print(X[:5])
+    print(time_event[:5])
 
     def get_observed_time(x):
         rnd_cens = np.random.RandomState(0)
@@ -35,7 +38,7 @@ def generate_survival_data(n_samples, hazard_ratio, baseline_hazard, percentage_
 
     res = opt.minimize_scalar(censoring_amount, method="bounded", bounds=(0, time_event.max()))
     event, time = get_observed_time(res.x)
-    y = Surv.from_arrays(event=event, time=time)
+    y = Surv.from_arrays(event=event, time=time) # what is y
     tau = y["time"].max()
     mask = time < tau
     X_masked = X[mask]
