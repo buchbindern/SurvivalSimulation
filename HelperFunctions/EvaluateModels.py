@@ -28,20 +28,20 @@ def simulation(n_samples, m, n_repeats=100, time_points=10):
     - time_points: int, number of evenly spaced evaluation time points for AUC and Brier score.
 
     Returns:
-    - results: Dictionary of results with model types as keys ("cph", "rsf", "gbsa"). 
+    - results: Dictionary of results with model types as keys (cph, rsf, gbsa). 
         Each model key maps to another dict with:
-            - "mean": List of DataFrames containing mean metric values across repeats for each censoring level.
-            - "std": List of DataFrames containing standard deviations of metrics across repeats.
-            - "censoring": List of observed censoring rates for each repeat.
+            - mean: List of DataFrames containing mean metric values across repeats for each censoring level.
+            - std: List of DataFrames containing standard deviations of metrics across repeats.
+            - censoring: List of observed censoring rates for each repeat.
 
         Each DataFrame includes the following evaluation metrics:
-            - "Actual C": Concordance with ground-truth risk scores
-            - "Harrel's C": Harrell’s Concordance index
-            - "Uno's C": Uno’s Concordance index
-            - "Baseline AUC": AUC using ground-truth risk scores
-            - "AUC": Model-predicted AUC
-            - "Brier": Integrated Brier Score
-            - "censoring": Observed censoring level 
+            - censoring: Observed censoring level
+            - Actual C: Concordance with ground-truth risk scores
+            - Harrel's C: Harrell’s Concordance index
+            - Uno's C: Uno’s Concordance index
+            - Baseline AUC: AUC using ground-truth risk scores
+            - AUC: Model-predicted AUC
+            - Brier: Integrated Brier Score 
     """
 
     rnd = np.random.RandomState(42) 
