@@ -1,0 +1,4 @@
+# Treat Jupyter notebooks as documentation so they don't dominate the
+# language statistics (their embedded figure outputs are large). The notebooks
+# still render and remain in the repository.
+*.ipynb linguist-documentation
