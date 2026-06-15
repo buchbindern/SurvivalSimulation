@@ -2,13 +2,15 @@
 
 A reproducible simulation study comparing three survival models — **Cox Proportional Hazards (CoxPH)**, **Random Survival Forest (RSF)**, and **Gradient Boosting Survival Analysis (GBSA)** — under increasing levels of right-censoring.
 
-The project generates synthetic survival data with controllable censoring, fits each model across repeated trials, and evaluates them with concordance, time-dependent AUC, and the integrated Brier score. It is inspired by the [scikit-survival guide on evaluating survival models](https://scikit-survival.readthedocs.io/en/stable/user_guide/evaluating-survival-models.html), extended to compare multiple models, add IPCW corrected metrics, control the censoring rate directly, and visualize how performance degrades as censoring grows.
+The project generates synthetic survival data with controllable censoring, fits each model across repeated trials, and evaluates them with concordance, time-dependent AUC, and the integrated Brier score. It is inspired by the [scikit-survival guide on evaluating survival models](https://scikit-survival.readthedocs.io/en/stable/user_guide/evaluating-survival-models.html), extended to compare multiple models, add IPCW-corrected metrics, control the censoring rate directly, and visualize how performance degrades as censoring grows.
 
 ## Methods
 
 **Data.** Survival times are drawn from an exponential model whose hazard depends on uniformly sampled covariates (following Bender et al., 2005). Right-censoring is introduced by numerically solving for the censoring distribution that yields a target rate (0%, 25%, 50%), with a convergence check so failed trials are skipped.
 
 **Models.** CoxPH (linear baseline), RSF (non-linear, ensemble of survival trees), and GBSA (gradient-boosted survival).
+
+**Evaluation.** Each dataset is split 70/30 into train and test (stratified on the event indicator), models are fit on the training split, and all metrics are computed on the held-out test split — using the training split as the censoring reference for the IPCW-based metrics. Results are averaged over repeated trials per censoring level.
 
 **Metrics.**
 
@@ -27,13 +29,15 @@ The project generates synthetic survival data with controllable censoring, fits 
 
 ![Model comparison](results/figures/model_comparison.png)
 
-Concordance is similar across all three models, but **GBSA leads on time-dependent AUC and the Brier score** at every censoring level. The gap widens as censoring increases.
+All three models reach similar concordance, but on held-out data **CoxPH leads on the integrated Brier score and time-dependent AUC** at every censoring level, while RSF is weakest. The data is generated from a proportional-hazards process, so the correctly-specified Cox model is hard to beat out of sample — the flexible tree ensembles gain nothing and pay an overfitting penalty, most visibly in calibration (Brier).
 
 ### Performance vs. censoring
 
 ![Performance vs. censoring](results/figures/censoring_performance.png)
 
-The Brier score makes the degradation clearest: prediction error rises with censoring for every model, and **GBSA remains best throughout** while RSF degrades fastest.
+The Brier score makes the degradation clearest: prediction error rises with censoring for every model, and **CoxPH stays best throughout** while RSF degrades fastest.
+
+**Takeaway.** Because evaluation is fully out of sample, the comparison rewards the model that matches the data-generating process rather than the most flexible one — a concrete illustration of why held-out evaluation matters when comparing survival models.
 
 ## Repository structure
 
