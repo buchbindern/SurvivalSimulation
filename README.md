@@ -59,10 +59,35 @@ SurvivalSimulation/
         └── censoring_performance.png
 ```
 
+## Environment setup
+
+A dedicated environment is recommended (the compiled dependencies — scikit-survival, NumPy, matplotlib — need to be built against a single, consistent NumPy version).
+
+```bash
+conda create -n survival python=3.11
+conda activate survival
+pip install -r requirements.txt
+```
+
+If `pip` fails to build scikit-survival, install that one through conda (which ships prebuilt binaries) and the rest through pip:
+
+```bash
+conda install -c conda-forge scikit-survival
+pip install -r requirements.txt
+```
+
+To run the notebook, register the environment as a Jupyter kernel and select **Python (survival)** from the kernel menu:
+
+```bash
+python -m ipykernel install --user --name survival --display-name "Python (survival)"
+```
+
+Tested with Python 3.11 and scikit-survival 0.22+.
+
 ## Running it
 
 ```bash
-pip install -r requirements.txt
+conda activate survival
 jupyter lab notebooks/survival_simulation_demo.ipynb
 ```
 
