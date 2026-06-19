@@ -104,11 +104,22 @@ def run_simulation(n_samples, m, n_repeats=100, time_points=10,
 
         for mt in MODEL_TYPES:
             df = pd.DataFrame(records[mt], columns=METRIC_COLUMNS)
+            if len(df) == 0:
+                # Every repeat at this censoring level failed to converge
+                # (only realistically possible at very low n_repeats) --
+                # skip it with a clear message instead of crashing on
+                # np.std of an empty array.
+                print(
+                    f"Warning: 0/{n_repeats} datasets converged for model "
+                    f"'{mt}' at censoring={cens}; skipping this level. "
+                    f"Increase n_repeats if this persists."
+                )
+                continue
             mean_row = pd.DataFrame(
                 {col: [np.mean(df[col].values)] for col in METRIC_COLUMNS}
             )
             std_row = pd.DataFrame(
-                {col: [np.std(df[col].values, ddof=1)] for col in METRIC_COLUMNS}
+                {col: [np.std(df[col].values, ddof=1) if len(df) > 1 else 0.0] for col in METRIC_COLUMNS}
             )
             results[mt]["mean"].append(mean_row)
             results[mt]["std"].append(std_row)

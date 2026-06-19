@@ -11,15 +11,18 @@ experiment loop.
 from sksurv.linear_model import CoxPHSurvivalAnalysis
 from sksurv.ensemble import RandomSurvivalForest, GradientBoostingSurvivalAnalysis
 
+from src.deepsurv_survival_analysis import DeepSurvSurvivalAnalysis
+
 
 # Model types compared in the simulation, in display order.
-MODEL_TYPES = ("cph", "rsf", "gbsa")
+MODEL_TYPES = ("cph", "rsf", "gbsa", "deepsurv")
 
 # Human-readable names, handy for plot titles and tables.
 MODEL_NAMES = {
     "cph": "Cox Proportional Hazards",
     "rsf": "Random Survival Forest",
     "gbsa": "Gradient Boosting Survival Analysis",
+    "deepsurv": "DeepSurv (PyTorch)",
 }
 
 
@@ -63,6 +66,21 @@ def build_model(model_type, random_state=None):
             learning_rate=0.1,
             n_estimators=100,
             max_depth=3,
+            random_state=random_state,
+        )
+
+    if model_type == "deepsurv":
+        # Smaller epoch budget than a standalone training run by default --
+        # this factory is called once per repeat in the censoring-level
+        # sweep (simulation.CENSORING_LEVELS x n_repeats calls), so the
+        # per-fit cost matters. Early stopping (patience) keeps this from
+        # being wasteful on datasets where the net converges quickly.
+        return DeepSurvSurvivalAnalysis(
+            hidden_dims=(32, 32),
+            dropout=0.4,
+            lr=1e-3,
+            epochs=150,
+            patience=15,
             random_state=random_state,
         )
 

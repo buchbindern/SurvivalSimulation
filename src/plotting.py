@@ -24,9 +24,10 @@ from src.models import MODEL_TYPES, MODEL_NAMES
 
 # Consistent color per model across every figure.
 MODEL_COLORS = {
-    "cph": "#4C72B0",   # blue
-    "rsf": "#DD8452",   # orange
-    "gbsa": "#55A868",  # green
+    "cph": "#4C72B0",     # blue
+    "rsf": "#DD8452",     # orange
+    "gbsa": "#55A868",    # green
+    "deepsurv": "#C44E52",  # red
 }
 
 # Metrics where a higher value is better vs. lower is better.
@@ -61,7 +62,8 @@ def plot_model_comparison(results, save_path=None):
     metrics = ["Harrell's C", "Uno's C", "AUC", "Brier"]
     labels = _censoring_labels(results)
     x = np.arange(len(labels))
-    width = 0.25
+    n_models = len(MODEL_TYPES)
+    width = 0.8 / n_models
 
     fig, axes = plt.subplots(2, 2, figsize=(13, 9))
     axes = axes.ravel()
@@ -69,7 +71,7 @@ def plot_model_comparison(results, save_path=None):
     for ax, metric in zip(axes, metrics):
         for i, mt in enumerate(MODEL_TYPES):
             mean_df, std_df = _assemble(results, mt)
-            offset = (i - 1) * width
+            offset = (i - (n_models - 1) / 2) * width
             ax.bar(
                 x + offset, mean_df[metric].values, width,
                 yerr=std_df[metric].values, capsize=3,
